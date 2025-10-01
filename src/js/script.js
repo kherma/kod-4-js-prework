@@ -14,3 +14,5 @@ let playerMove = 'paper';
 printMessage(
   `I played ${computerMove}! If your move is ${playerMove}, you won!`
 );
+
+const random = Math.ceil(Math.random() * 3);
