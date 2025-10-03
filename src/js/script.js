@@ -1,66 +1,100 @@
-// Utils
+// Shapes
+const shapes = {
+  rock: 'rock',
+  paper: 'paper',
+  scissors: 'scissors',
+  invalid: 'invalid',
+};
+
+const shapesRelations = [
+  {
+    displayName: shapes.rock,
+    id: 1,
+    win: [shapes.scissors],
+    lose: [shapes.paper],
+  },
+  {
+    displayName: shapes.paper,
+    id: 2,
+    win: [shapes.rock],
+    lose: [shapes.scissors],
+  },
+  {
+    displayName: shapes.scissors,
+    id: 3,
+    win: [shapes.paper],
+    lose: [shapes.rock],
+  },
+  {
+    displayName: shapes.invalid,
+  },
+];
+
+// Messages
+const messages = {
+  promptText: 'Choose Your move! 1: rock, 2: paper, 3: scissors.',
+  invalid: 'Invalid move! Please try again.',
+  draw: "It's a draw!",
+  playerWin: 'Congratulations! You win!',
+  computerWin: 'Oops! Computer wins!',
+  unknownMove(id) {
+    return `Unknown move with ID: ${id}`;
+  },
+  resultsMessage(computerMove, playerMove) {
+    return `
+    Computer played: ${computerMove}!
+    -------
+    Player played: ${playerMove}!
+    `;
+  },
+};
 
 const printMessage = (message) => {
   console.log(message);
 };
 
-const shapesRelations = {
-  rock: {
-    win: ['scissors'],
-    lose: ['paper'],
-  },
-  paper: {
-    win: ['rock'],
-    lose: ['scissors'],
-  },
-  scissors: {
-    win: ['paper'],
-    lose: ['rock'],
-  },
-};
+// Utils
+const randomNumber = (max = 3) => Math.ceil(Math.random() * max);
 
-const messages = {
-  invalid: 'Invalid move! Please try again.',
-  draw: "It's a draw!",
-  playerWin: 'Congratulations! You win!',
-  computerWin: 'Oops! Computer wins!',
-};
+// Game Events
+function getMoveName(argMoveId) {
+  const shape = shapesRelations.find(({ id }) => id === argMoveId);
 
-// Read Computer move
-const computerInput = Math.ceil(Math.random() * 3);
-let computerMove = 'unknown move';
+  if (!shape) {
+    printMessage(messages.unknownMove(argMoveId));
+    return shapesRelations.find(
+      ({ displayName }) => displayName === shapes.invalid
+    );
+  }
 
-if (computerInput == '1') {
-  computerMove = 'rock';
-} else if (computerInput == '2') {
-  computerMove = 'paper';
-} else if (computerInput == '3') {
-  computerMove = 'scissors';
+  return shape;
 }
 
-printMessage(`Computer move is: ${computerMove}`);
+function displayResult(argComputerMove, argPlayerMove) {
+  printMessage(
+    messages.resultsMessage(
+      argComputerMove.displayName,
+      argPlayerMove.displayName
+    )
+  );
 
-// Read player move
-let playerInput = prompt('Choose Your move! 1: rock, 2: paper, 3: scissors.');
-let playerMove = 'unknown move';
-
-if (playerInput == '1') {
-  playerMove = 'rock';
-} else if (playerInput == '2') {
-  playerMove = 'paper';
-} else if (playerInput == '3') {
-  playerMove = 'scissors';
+  if (argPlayerMove.displayName === shapes.invalid) {
+    printMessage(messages.invalid);
+  } else if (argComputerMove.displayName === argPlayerMove.displayName) {
+    printMessage(messages.draw);
+  } else if (argPlayerMove.win.includes(argComputerMove.displayName)) {
+    printMessage(messages.playerWin);
+  } else {
+    printMessage(messages.computerWin);
+  }
 }
 
-printMessage(`Player move is: ${playerMove}`);
-
-// Read game result
-if (playerMove === 'unknown move') {
-  printMessage(messages.invalid);
-} else if (playerMove === computerMove) {
-  printMessage(messages.draw);
-} else if (shapesRelations[playerMove].win.includes(computerMove)) {
-  printMessage(messages.playerWin);
-} else {
-  printMessage(messages.computerWin);
+// Game Init
+function init() {
+  let computerMove = getMoveName(randomNumber());
+  let playerInput = prompt(messages.promptText);
+  let playerMove = getMoveName(Number(playerInput));
+  displayResult(computerMove, playerMove);
 }
+
+init();
