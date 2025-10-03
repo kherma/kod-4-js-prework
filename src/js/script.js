@@ -1,3 +1,6 @@
+// Variables
+const BUTTONS_ID = 'buttons';
+
 // Shapes
 const shapes = {
   rock: 'rock',
@@ -32,7 +35,7 @@ const shapesRelations = [
 
 // Messages
 const messages = {
-  promptText: 'Choose Your move! 1: rock, 2: paper, 3: scissors.',
+  initText: 'Choose Your move! Rock, Paper or Scissors.',
   invalid: 'Invalid move! Please try again.',
   draw: "It's a draw!",
   playerWin: 'Congratulations! You win!',
@@ -41,17 +44,19 @@ const messages = {
     return `Unknown move with ID: ${id}`;
   },
   resultsMessage(computerMove, playerMove) {
-    return `
-    Computer played: ${computerMove}!
-    -------
-    Player played: ${playerMove}!
-    `;
+    return `Computer played: ${computerMove.toUpperCase()}! Player played: ${playerMove.toUpperCase()}!`;
   },
 };
 
-const printMessage = (message) => {
-  console.log(message);
-};
+function printMessage(msg) {
+  let div = document.createElement('div');
+  div.innerHTML = msg;
+  document.getElementById('messages').appendChild(div);
+}
+
+function clearMessages() {
+  document.getElementById('messages').innerHTML = '';
+}
 
 // Utils
 const randomNumber = (max = 3) => Math.ceil(Math.random() * max);
@@ -89,12 +94,22 @@ function displayResult(argComputerMove, argPlayerMove) {
   }
 }
 
-// Game Init
-function init() {
-  let computerMove = getMoveName(randomNumber());
-  let playerInput = prompt(messages.promptText);
-  let playerMove = getMoveName(Number(playerInput));
+function playGame(playerInput) {
+  clearMessages();
+  const computerMove = getMoveName(randomNumber());
+  const playerMove = getMoveName(playerInput);
   displayResult(computerMove, playerMove);
+}
+
+function init() {
+  printMessage(messages.initText);
+  const buttons = document.getElementById(BUTTONS_ID);
+
+  buttons.addEventListener('click', (event) => {
+    if (event.target !== buttons) {
+      playGame(parseInt(event.target.value));
+    }
+  });
 }
 
 init();
